@@ -1,44 +1,61 @@
 <template>
-		<main>
-			<section class="input-section">
-				<input
-					type="text"
-					class="search-box-input"
-					placeholder="Type the city name..."
-					v-model="cityName"
-					@keypress.enter="getCityWeather()"
-				/>
-				<button type="search" class="search-button" @click="getCityWeather"><i class="fa fa-search"></i></button>
-				
+	<main>
+		<h1>City Weather</h1>
+
+		<section class="input-section">
+			<input
+				v-focus
+				type="text"
+				class="search-box-input"
+				placeholder="Type the city name..."
+				v-model="cityName"
+				@keypress.enter="getCityWeather()"
+			/>
+			<button type="search" class="search-button" @click="getCityWeather">
+				<i class="fa fa-search"></i>
+			</button>
+		</section>
+		<transition name="fade">
+			<section class="weather-section" v-if="hasWeather">
+				<div class="city">{{weather.name}}, {{weather.sys.country}}</div>
+				<div class="date">{{formattedDate}}</div>
+				<div class="temperature">{{roundedTemperature}}°C</div>
+				<div class="description">{{weather.weather[0].description}}</div>
 			</section>
-			  <div class="spinner" v-if="isLoading"><circle-spinner></circle-spinner></div>
-				<section class="weather-section" v-else-if="hasWeather">
-					<div class="city">{{weather.name}}, {{weather.sys.country}}</div>
-					<div class="date">{{formattedDate}}</div>
-					<div class="temperature">{{roundedTemperature}}°C</div>
-					<div class="description">{{weather.weather[0].description}}</div>
+			<section class="weather-section" v-else-if="cityNotFound">
+				<div class="city">City not found</div>
 			</section>
-		</main>
+		</transition>
+	</main>
 </template>
 
 <script>
-import { CircleSpinner } from 'vue-spinners'
+
 export default {
 	name: "Weather",
-	components:{
-			"circle-spinner":CircleSpinner
+	directives: {
+		focus: {
+			inserted: function(el) {
+				el.focus();
+			}
+		}
 	},
+
 	data: function() {
 		return {
 			weather: {},
 			cityName: "",
-			isLoading:false,
+			cityNotFound: false
 		};
 	},
 	methods: {
 		async getCityWeather() {
-			this.isLoading = true;
-			
+			this.cityNotFound = false;
+			this.weather = {};
+			if (this.cityName == "") {
+				return;
+			}
+
 			try {
 				const response = await this.$http.get("weather", {
 					params: { q: this.cityName }
@@ -46,8 +63,9 @@ export default {
 				this.weather = response.data;
 				this.cityName = "";
 			} catch (err) {
-				console.log(err);
-			}finally{
+				this.isLoading = false;
+				this.cityNotFound = true;
+			} finally {
 				this.isLoading = false;
 			}
 		}
@@ -59,10 +77,15 @@ export default {
 		hasWeather: function() {
 			return Object.keys(this.weather).length > 1 ? true : false;
 		},
-		formattedDate(){
-			const options = {weekday:"short", year:"numeric", month:"short", day:"numeric"};
-			let formattedDate = new Date(this.weather.dt*1000);
-			return formattedDate.toLocaleString(undefined,options);
+		formattedDate() {
+			const options = {
+				weekday: "short",
+				year: "numeric",
+				month: "short",
+				day: "numeric"
+			};
+			let formattedDate = new Date(this.weather.dt * 1000);
+			return formattedDate.toLocaleString(undefined, options);
 		}
 	}
 };
@@ -70,32 +93,40 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
 
 main {
-	display:grid;
-	grid-template-areas: "input"
-												"data";
-	grid-template-rows: 200px 1fr;
+	display: grid;
+	grid-template-areas:
+		"title"
+		"input"
+		"weather";
+	grid-template-rows: 12vh 12vh 1fr;
 	grid-template-columns: 1fr;
-	
-	
-
+	grid-auto-rows: 10vh;
 }
+
+h1 {
+	grid-area: title;
+	text-align: center;
+	margin: 20px 0;
+	font-size: 3em;
+	color: #fff;
+}
+
 .input-section {
-	grid-area:input;
-	display:flex;
+	grid-area: input;
+	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin:0 10px;
-	
+	margin: 0 10px;
 }
 
 .input-section .search-box-input {
-	border:0px;
-	margin-left:10px;
+	border: 0px;
+	margin-left: 10px;
 	font-size: 1.7em;
-	padding: .5em;
+	padding: 0.5em;
 	color: #39444d;
 	outline: none;
 	appearance: none;
@@ -110,42 +141,40 @@ main {
 	background-color: rgba(178, 233, 243, 0.5);
 }
 
-.input-section .search-button{
-	position:relative;
-	right:40px;
-	top:0;
-	border-radius:50%;
-	background-color:transparent;
-	border:0;
-	cursor:pointer;
-	font-size:1.9em;
-	outline:none;
-	
+.input-section .search-button {
+	position: relative;
+	right: 40px;
+	top: 0;
+	border-radius: 50%;
+	background-color: transparent;
+	border: 0;
+	cursor: pointer;
+	font-size: 1.9em;
+	outline: none;
 }
 
 .weather-section {
-	grid-area:data;
-	display:block;
+	grid-area: weather;
+
 	text-align: center;
 	transition: 2s;
 }
- .weather-section .city {
+.weather-section .city {
 	font-size: 2em;
 	color: #fff;
 	text-shadow: 2px 2px rgba(0, 0, 0, 0.25);
 	font-weight: 600;
-	
 }
- .weather-section .date {
+.weather-section .date {
 	font-size: 2em;
 	color: #fff;
 	text-shadow: 2px 2px rgba(0, 0, 0, 0.4);
 	font-weight: 300;
 	font-style: italic;
-	margin-bottom:10px;
+	margin-bottom: 10px;
 }
 
- .weather-section .temperature {
+.weather-section .temperature {
 	display: inline-block;
 	font-size: 7em;
 	font-weight: 800;
@@ -158,8 +187,8 @@ main {
 	margin: 0 0 10px;
 }
 
- .weather-section .description {
-	text-transform:capitalize;
+.weather-section .description {
+	text-transform: capitalize;
 	font-size: 3em;
 	color: #fff;
 	font-style: italic;
@@ -167,7 +196,12 @@ main {
 	text-shadow: 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.spinner{
-	z-index:2;
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+	opacity: 0;
+	transition: 0.5s;
 }
 </style>
