@@ -5,6 +5,7 @@
 		<section class="input-section">
 			<input
 				v-focus
+				
 				type="text"
 				class="search-box-input"
 				placeholder="Type the city name..."
@@ -30,7 +31,6 @@
 </template>
 
 <script>
-
 export default {
 	name: "Weather",
 	directives: {
@@ -101,30 +101,27 @@ main {
 		"title"
 		"input"
 		"weather";
-	grid-template-rows: 12vh 12vh 1fr;
-	grid-template-columns: 1fr;
-	grid-auto-rows: 10vh;
+
+	grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+	grid-gap: 10px;
 }
 
 h1 {
 	grid-area: title;
 	text-align: center;
-	margin: 20px 0;
+	margin: 1em .5em;
 	font-size: 3em;
 	color: #fff;
 }
 
 .input-section {
 	grid-area: input;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin: 0 10px;
+	text-align: center;
 }
 
 .input-section .search-box-input {
 	border: 0px;
-	margin-left: 10px;
+	box-sizing: border-box;
 	font-size: 1.7em;
 	padding: 0.5em;
 	color: #39444d;
@@ -136,15 +133,20 @@ h1 {
 	transition: 0.4s;
 }
 
+@media screen and (max-width: 500px) {
+	.input-section .search-box-input {
+		font-size: 1.2em;
+	}
+}
+
 .input-section .search-box-input:focus {
 	border-radius: 15px 5px 15px 5px;
 	background-color: rgba(178, 233, 243, 0.5);
 }
 
 .input-section .search-button {
-	position: relative;
-	right: 40px;
-	top: 0;
+	margin-left: 0.2em;
+	margin-top: 0.2em;
 	border-radius: 50%;
 	background-color: transparent;
 	border: 0;
@@ -152,10 +154,13 @@ h1 {
 	font-size: 1.9em;
 	outline: none;
 }
+i {
+	outline: none;
+}
 
 .weather-section {
 	grid-area: weather;
-
+ margin: 1em 0;
 	text-align: center;
 	transition: 2s;
 }
@@ -178,12 +183,12 @@ h1 {
 	display: inline-block;
 	font-size: 7em;
 	font-weight: 800;
-	padding: 20px;
+	padding: 0.1em;
 	color: #fff;
 	background-color: rgba(255, 255, 255, 0.2);
 	text-shadow: 1px 1px rgba(255, 255, 255, 0.9);
 	box-shadow: 3px 5px rgba(0, 0, 0, 0.3);
-	border-radius: 10px;
+	border-radius: 0.1em;
 	margin: 0 0 10px;
 }
 
