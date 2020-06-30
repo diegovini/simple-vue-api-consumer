@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiKey = "aa7c8b97a3e5f403bac49e176978c802"
+const apiKey = process.env.VUE_APP_OPENWEATHER_API_KEY;
 const units = "metric"
 //const lang=""
 const baseURL = `https://cors-anywhere.herokuapp.com/https://api.openweathermap.org/data/2.5/`
