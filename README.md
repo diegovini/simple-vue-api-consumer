@@ -3,7 +3,7 @@ I've created a simple api consumer using Vuejs.
 In order to use it, follow the steps belows:
 
 ### Building the docker image
-To build the docker image run the following command:
+To build the docker image run the following command (Do not forget to pass your Api Key when building the docker image):
 
 `docker build --build-arg VUE_APP_OPENWEATHER_API_KEY=YOUR_OPENWEATHER_API_KEY -t dockerized-weatherapp .` 
 
