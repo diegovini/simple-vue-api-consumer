@@ -5,7 +5,6 @@
 		<section class="input-section">
 			<input
 				v-focus
-				
 				type="text"
 				class="search-box-input"
 				placeholder="Type the city name..."
@@ -57,11 +56,18 @@ export default {
 			}
 
 			try {
-				const response = await this.$http.get("weather", {
-					params: { q: this.cityName }
-				});
-				this.weather = response.data;
-				this.cityName = "";
+				if (process.env.VUE_APP_OPENWEATHER_API_KEY) {
+					const response = await this.$http.get("weather", {
+						params: { q: this.cityName }
+					});
+					this.weather = response.data;
+				} else {
+					const response = await this.$http.get(this.cityName);
+
+					this.weather = response.data;
+
+					this.cityName = "";
+				}
 			} catch (err) {
 				this.isLoading = false;
 				this.cityNotFound = true;
@@ -109,7 +115,7 @@ main {
 h1 {
 	grid-area: title;
 	text-align: center;
-	margin: 1em .5em;
+	margin: 1em 0.5em;
 	font-size: 3em;
 	color: #fff;
 }
@@ -160,7 +166,7 @@ i {
 
 .weather-section {
 	grid-area: weather;
- margin: 1em 0;
+	margin: 1em 0;
 	text-align: center;
 	transition: 2s;
 }
